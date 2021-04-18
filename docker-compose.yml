@@ -1,0 +1,38 @@
+version: '3.7'
+services: 
+    rabbitmq:
+        image: rabbitmq:management 
+        container_name: rabbitmq
+        restart: always
+        ports: 
+            - 5672:5672
+            - 15672:15672
+        networks: 
+            - microservice
+    
+    redis:
+        image: redis:alpine
+        container_name: redis
+        # ports: 
+        #     - 6379:6379
+        networks: 
+            - redis_network
+    
+    otp_service:
+        build: otp/
+        container_name: otp
+        environment: 
+            - REDIS_SERVER=redis
+            - EXPIRES_MINUTES=3
+        networks: 
+            - microservice
+            - redis_network
+
+networks: 
+    redis_network:
+        external: 
+            name: redis_network
+    
+    microservice:
+        external: 
+            name: microservices_network
